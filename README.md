@@ -6,7 +6,7 @@
 
 **GitHub Repository:** [github.com/SamurAIGPT/ai-real-estate-stager](https://github.com/SamurAIGPT/ai-real-estate-stager)
 
-**Live Demo Preview:** [estatestager-sites.easysite.ai/staging](https://estatestager-sites.easysite.ai/staging)
+**Live Demo Preview:** [ai-real-estate-stager.vercel.app](https://ai-real-estate-stager.vercel.app/)
 
 ---
 
@@ -63,6 +63,8 @@ This architecture is engineered explicitly for **Vercel** serverless environment
 ### One-Click Deploy
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/SamurAIGPT/ai-real-estate-stager)
+
+**Live App:** [ai-real-estate-stager.vercel.app](https://ai-real-estate-stager.vercel.app/)
 
 ### 🔑 Required Environment Variables
 
