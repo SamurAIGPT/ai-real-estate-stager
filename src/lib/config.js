@@ -1,4 +1,5 @@
 const config = {
+  appName: "Ai Real Estate Stager",
   auth: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID,
