@@ -17,7 +17,7 @@ export function Navbar() {
 
   const links = [...navLinks];
   if (session?.user) {
-    links.splice(1, 0, { name: "My Gallery", href: "/dashboard" });
+    links.splice(1, 0, { name: "My Gallery", href: "/gallery" });
   }
 
   return (
