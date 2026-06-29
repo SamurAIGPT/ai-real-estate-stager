@@ -229,11 +229,7 @@ export default function RoomStagerPage() {
       if (res.ok) {
         const data = await res.json();
         
-        let pollCount = 0;
-        const maxPolls = 15; // 15 polls * 2s = 30s max wait
-        
         const pollInterval = setInterval(async () => {
-          pollCount++;
           try {
             const statusRes = await fetch(`/api/rooms?id=${data.roomId}`);
             if (statusRes.ok) {
@@ -259,13 +255,6 @@ export default function RoomStagerPage() {
             }
           } catch (e) {
             console.error("Client polling error:", e);
-          }
-          
-          if (pollCount >= maxPolls) {
-            clearInterval(pollInterval);
-            clearInterval(timerInterval);
-            setStagingStatus("error");
-            setStagingError("Staging request is taking longer than expected. We are processing it in the background! Please check your Gallery dashboard shortly.");
           }
         }, 2000);
       } else {
