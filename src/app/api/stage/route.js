@@ -28,23 +28,29 @@ export async function POST(req) {
       return new NextResponse("Original image is required", { status: 400 });
     }
 
-    // 1. Deduct 6 credits from user
-    const cost = config.ai.generationCost || 6;
-    try {
-      await UserService.deductCredits(session.user.id, cost);
-    } catch (err) {
-      return new NextResponse("Insufficient credits", { status: 402 });
+    const headerApiKey = req.headers.get("x-custom-api-key");
+    const customApiKey = headerApiKey || body.customApiKey || session.user.customApiKey || null;
+    const isUsingCustomKey = Boolean(customApiKey && customApiKey.trim().length > 0);
+
+    // Cost logic: 6 credits (0 if custom API key active)
+    const cost = isUsingCustomKey ? 0 : (config.ai.generationCost || 6);
+
+    if (!isUsingCustomKey && cost > 0) {
+      try {
+        await UserService.deductCredits(session.user.id, cost);
+      } catch (err) {
+        return new NextResponse("Insufficient credits", { status: 402 });
+      }
     }
 
-    // 2. Process Staging
-    const apiKey = config.ai.apiKey;
+    // Process Staging
+    const apiKey = isUsingCustomKey ? customApiKey.trim() : config.ai.apiKey;
     let stagedImage = FALLBACK_STAGED_IMAGES[roomType] || FALLBACK_STAGED_IMAGES["living-room"];
     let requestId = `mock_${Date.now()}`;
 
     if (apiKey && !apiKey.includes("your_") && apiKey.trim() !== "") {
       try {
         const webhookUrl = `${config.auth.webhook_url}/api/webhook/muapi`;
-        // Forward image-to-image/inpainting task to MuAPI nano-banana-edit with webhook callbacks
         const submitRes = await fetch(`https://api.muapi.ai/api/v1/nano-banana-edit?webhook=${encodeURIComponent(webhookUrl)}`, {
           method: "POST",
           headers: {
@@ -112,7 +118,7 @@ export async function POST(req) {
       }
     }
 
-    // 3. Save records in StagedRoom
+    // Save records in StagedRoom
     const isCompleted = stagedImage && stagedImage !== "";
     const status = isCompleted ? "completed" : "generating";
 

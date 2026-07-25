@@ -14,6 +14,10 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
+    const headerApiKey = req.headers.get("x-custom-api-key");
+    const customApiKey = headerApiKey || session.user.customApiKey || null;
+    const apiKey = (customApiKey && customApiKey.trim().length > 0) ? customApiKey.trim() : config.ai.apiKey;
+
     if (id) {
       let room = await prisma.stagedRoom.findFirst({
         where: { id, userId: session.user.id }
@@ -23,7 +27,6 @@ export async function GET(req) {
       }
 
       if (room.status === "generating" && room.requestId && !room.requestId.startsWith("mock_")) {
-        const apiKey = config.ai.apiKey;
         if (apiKey && !apiKey.includes("your_") && apiKey.trim() !== "") {
           try {
             const pollRes = await fetch(`https://api.muapi.ai/api/v1/predictions/${room.requestId}/result`, {
